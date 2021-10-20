@@ -7,6 +7,7 @@ import {
   noPuedeSerStrider,
 } from '../../../shared/validator/validaciones';
 import { ValidatorService } from 'src/app/shared/validator/validator.service';
+import { EmailValidatorService } from '../../../shared/validator/email-validator.service';
 @Component({
   selector: 'app-registro',
   templateUrl: './registro.component.html',
@@ -28,6 +29,7 @@ export class RegistroComponent implements OnInit {
           Validators.required,
           Validators.pattern(this.validatorService.emailPattern),
         ],
+        [this.emailValidator],
       ],
       // Cuando se use una validación personalizada, al llamar al método, recordar no usar ()
       userName: [
@@ -44,9 +46,22 @@ export class RegistroComponent implements OnInit {
     }
   );
 
+  get emailErrorMsg(): string {
+    const errors = this.miFormulario.get('email')?.errors;
+    if (errors?.required) {
+      return 'El email es obligatorio';
+    } else if (errors?.pattern) {
+      return 'El valor ingresado no tiene formato de correo';
+    } else if (errors?.emailUsado) {
+      return 'El email ya ha sido usado';
+    }
+    return '';
+  }
+
   constructor(
     private fb: FormBuilder,
-    private validatorService: ValidatorService
+    private validatorService: ValidatorService,
+    private emailValidator: EmailValidatorService
   ) {}
 
   ngOnInit(): void {
@@ -54,6 +69,8 @@ export class RegistroComponent implements OnInit {
       nombre: 'David Martinez',
       email: 'test1@test.com',
       userName: 'Sifu1982',
+      password: '123456',
+      password2: '123456',
     });
   }
 
